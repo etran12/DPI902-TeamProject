@@ -1,3 +1,142 @@
+<?php
+// define variables and set to empty values
+$nameErr = $emailErr = $genderErr = $websiteErr = "";
+$name = $email = $gender = $comment = $website = "";
+
+$serverName = "localhost";
+$username = "bwcho";
+$password = "123Qaz";
+$dbName = "dpi902";
+
+if (isset($_GET['id']))
+{
+	  
+	// Create connection
+	$conn = new mysqli($servername, $username, $password, $dbname);
+	// Check connection
+	if ($conn->connect_error) 
+	{
+		die("Connection failed: " . $conn->connect_error);
+	} 
+
+$sql = "SELECT * FROM ARTICLE WHERE ID = '" + $_GET['id'] + "'";
+$result = $conn->query($sql);
+
+	if ($result->num_rows > 0) 
+	{
+		// output data of each row
+		while($row = $result->fetch_assoc()) 
+		{
+			echo "id: " . $row["id"]. " - Name: " . $row["firstname"]. " " . $row["lastname"]. "<br>";
+		}
+	} 
+	else 
+	{
+		echo "0 results";
+	}
+$conn->close(); 
+}
+
+}
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") 
+{
+	if (empty($_POST["name"])) 
+	{
+		$nameErr = "Name is required";
+	}
+	else
+	{
+		$name = test_input($_POST["name"]);
+		// check if name only contains letters and whitespace
+		if (!preg_match("/^[a-zA-Z ]*$/",$name)) 
+		{
+			$nameErr = "Only letters and white space allowed"; 
+		}
+	}
+  
+	if (empty($_POST["email"])) 
+	{
+		$emailErr = "Email is required";
+	}
+	else 
+	{
+		$email = test_input($_POST["email"]);
+		// check if e-mail address is well-formed
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) 
+		{
+		$emailErr = "Invalid email format"; 
+		}
+	}
+    
+	if (empty($_POST["website"])) 
+	{
+		$website = "";
+	} 
+	else 
+	{
+		$website = test_input($_POST["website"]);
+		// check if URL address syntax is valid (this regular expression also allows dashes in the URL)
+		if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$website)) 
+		{
+			$websiteErr = "Invalid URL"; 
+		}
+	}
+
+	if (empty($_POST["comment"])) 
+	{
+		$comment = "";
+	} 
+	else 
+	{
+		$comment = test_input($_POST["comment"]);
+	}
+  
+	// Create connection
+	$conn = new mysqli($servername, $username, $password, $dbname);
+	// Check connection
+	if ($conn->connect_error) 
+	{
+		die("Connection failed: " . $conn->connect_error);
+	} 
+
+$sql = "SELECT * FROM ARTICLE WHERE ID = '" + $_GET['id'] + "'";
+$result = $conn->query($sql);
+
+	if ($result->num_rows > 0) 
+	{
+		// output data of each row
+		while($row = $result->fetch_assoc()) 
+		{
+			echo "id: " . $row["id"]. " - Name: " . $row["firstname"]. " " . $row["lastname"]. "<br>";
+		}
+	} 
+	else 
+	{
+		echo "0 results";
+	}
+$conn->close(); 
+}
+
+function securityFilter()
+{
+	
+}
+
+function securityScreen1()
+{
+	
+}
+
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+?>
+
 <div class="panel panel-default">
 	<div class="panel-heading">
 		<a href="">Back to list</a>
@@ -7,45 +146,9 @@
 		<div class = "row">
 			<div class = "col-xs-8 col-xs-offset-2">
 				<div>
-					<p>
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					</p>
-			
-					<p>
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					</p>
-			
-					<p>
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					</p>
-			
-					<p>
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					content content content content content content content content content content content content
-					</p>
+				<?php
+					
+				?>
 				</div>
 			</div>
 		</div>
