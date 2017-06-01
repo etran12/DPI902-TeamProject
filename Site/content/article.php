@@ -2,32 +2,41 @@
 // define variables and set to empty values
 $nameErr = $emailErr = $genderErr = $websiteErr = "";
 $name = $email = $gender = $comment = $website = "";
-
 $serverName = "localhost";
-$username = "bwcho";
-$password = "123Qaz";
+$username = "user";
+$password = "password";
 $dbName = "dpi902";
-
 if (isset($_GET['id']))
 {
-	  
 	// Create connection
-	$conn = new mysqli($servername, $username, $password, $dbname);
+	$conn = new mysqli($serverName, $username, $password, $dbName);
 	// Check connection
+
 	if ($conn->connect_error) 
 	{
+		
+		echo $_GET['id'];
+
 		die("Connection failed: " . $conn->connect_error);
 	} 
+	$sql = "SELECT * FROM ARTICLE WHERE ID='" . $_GET['id'] . "'";
 
-$sql = "SELECT * FROM ARTICLE WHERE ID = '" + $_GET['id'] + "'";
-$result = $conn->query($sql);
+	$result = $conn->query($sql);		
 
+	//echo $result->num_rows;	
+	//echo $result->field_count;
+	echo $result->fetch_fields();
 	if ($result->num_rows > 0) 
 	{
-		// output data of each row
-		while($row = $result->fetch_assoc()) 
+		echo "We got rows";
+		// output data of each rows
+		//while($row = $result->fetch_assoc())
+		//echo mysqli_fetch_object($result);
+		//while($row = mysql_fetch_object($result)) 
+		while($row = $result->fetch_row())
 		{
-			echo "id: " . $row["id"]. " - Name: " . $row["firstname"]. " " . $row["lastname"]. "<br>";
+			echo $row[2];
+			echo "id: " . $row->content . "<br>";
 		}
 	} 
 	else 
@@ -36,9 +45,6 @@ $result = $conn->query($sql);
 	}
 $conn->close(); 
 }
-
-}
-
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") 
 {
@@ -83,7 +89,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 			$websiteErr = "Invalid URL"; 
 		}
 	}
-
 	if (empty($_POST["comment"])) 
 	{
 		$comment = "";
@@ -100,10 +105,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	{
 		die("Connection failed: " . $conn->connect_error);
 	} 
-
 $sql = "SELECT * FROM ARTICLE WHERE ID = '" + $_GET['id'] + "'";
 $result = $conn->query($sql);
-
 	if ($result->num_rows > 0) 
 	{
 		// output data of each row
@@ -118,17 +121,14 @@ $result = $conn->query($sql);
 	}
 $conn->close(); 
 }
-
 function securityFilter()
 {
 	
 }
-
 function securityScreen1()
 {
 	
 }
-
 function test_input($data) {
   $data = trim($data);
   $data = stripslashes($data);
