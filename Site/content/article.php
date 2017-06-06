@@ -6,12 +6,13 @@ $serverName = "localhost";
 $username = "user";
 $password = "password";
 $dbName = "dpi902";
+
 if (isset($_GET['id']))
 {
+	/*
 	// Create connection
 	$conn = new mysqli($serverName, $username, $password, $dbName);
 	// Check connection
-
 	if ($conn->connect_error) 
 	{
 		
@@ -19,20 +20,16 @@ if (isset($_GET['id']))
 
 		die("Connection failed: " . $conn->connect_error);
 	} 
-	$sql = "SELECT * FROM ARTICLE WHERE ID='" . $_GET['id'] . "'";
+	*/
+	$conn = sqlConnection();
+	
+	$sqlquery = "SELECT * FROM ARTICLE WHERE ID='" . $_GET['id'] . "'";
 
-	$result = $conn->query($sql);		
+	$result = $conn->query($sqlquery);		
 
-	//echo $result->num_rows;	
-	//echo $result->field_count;
-	echo $result->fetch_fields();
+	//echo $result->fetch_fields();
 	if ($result->num_rows > 0) 
 	{
-		echo "We got rows";
-		// output data of each rows
-		//while($row = $result->fetch_assoc())
-		//echo mysqli_fetch_object($result);
-		//while($row = mysql_fetch_object($result)) 
 		while($row = $result->fetch_row())
 		{
 			echo $row[2];
@@ -46,7 +43,7 @@ if (isset($_GET['id']))
 $conn->close(); 
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") 
+if (isset($_POST['id'])) 
 {
 	if (empty($_POST["name"])) 
 	{
@@ -98,6 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 		$comment = test_input($_POST["comment"]);
 	}
   
+	/*
 	// Create connection
 	$conn = new mysqli($servername, $username, $password, $dbname);
 	// Check connection
@@ -105,22 +103,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	{
 		die("Connection failed: " . $conn->connect_error);
 	} 
-$sql = "SELECT * FROM ARTICLE WHERE ID = '" + $_GET['id'] + "'";
-$result = $conn->query($sql);
+	
+	*/
+	
+	$conn = sqlConnection();
+	
+	//Adjust Query to do insert
+	$sqlquery = "INSERT * FROM ARTICLE WHERE ID='" . $_POST['id'] . "'";
+
+	$result = $conn->query($sqlquery);		
+
+	//echo $result->fetch_fields();
 	if ($result->num_rows > 0) 
 	{
-		// output data of each row
-		while($row = $result->fetch_assoc()) 
+		while($row = $result->fetch_row())
 		{
-			echo "id: " . $row["id"]. " - Name: " . $row["firstname"]. " " . $row["lastname"]. "<br>";
+			echo $row[2];
+			echo "id: " . $row->content . "<br>";
 		}
 	} 
 	else 
 	{
 		echo "0 results";
 	}
-$conn->close(); 
+	$conn->close(); 
 }
+
+function sqlConnection()
+{
+	// Create connection
+	$conn = new mysqli($serverName, $username, $password, $dbName);
+	// Check connection
+
+	if ($conn->connect_error) 
+	{
+		echo $_GET['id'];
+
+		die("Connection failed: " . $conn->connect_error);
+	}
+	
+	return $conn;
+}
+
 function securityFilter()
 {
 	
