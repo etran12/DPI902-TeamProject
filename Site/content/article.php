@@ -1,11 +1,16 @@
 <?php
 // define variables and set to empty values
-$nameErr = $emailErr = $genderErr = $websiteErr = "";
-$name = $email = $gender = $comment = $website = "";
+$nameErr = $emailErr = "";
+$name = $email = $comment = "";
+
+//DB Variables
 $serverName = "localhost";
 $username = "user";
 $password = "password";
 $dbName = "dpi902";
+
+//Determines if Comment is a Reply to a Comment or a Comment on the Article
+$targetTable = "";
 
 if (isset($_GET['id']))
 {
@@ -32,7 +37,6 @@ if (isset($_GET['id']))
 	{
 		while($row = $result->fetch_row())
 		{
-			echo $row[2];
 			echo "id: " . $row->content . "<br>";
 		}
 	} 
@@ -45,6 +49,11 @@ $conn->close();
 
 if (isset($_POST['id'])) 
 {
+	if(isset($_POST['form-submitComment']))
+		$targetTable = $_POST['form-submitComment'];
+	//else if (isset($_POST['form-submitReply']))
+		//$targetTable = $_POST['form-submitReply'];
+	
 	if (empty($_POST["name"])) 
 	{
 		$nameErr = "Name is required";
@@ -72,20 +81,6 @@ if (isset($_POST['id']))
 		$emailErr = "Invalid email format"; 
 		}
 	}
-    
-	if (empty($_POST["website"])) 
-	{
-		$website = "";
-	} 
-	else 
-	{
-		$website = test_input($_POST["website"]);
-		// check if URL address syntax is valid (this regular expression also allows dashes in the URL)
-		if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$website)) 
-		{
-			$websiteErr = "Invalid URL"; 
-		}
-	}
 	if (empty($_POST["comment"])) 
 	{
 		$comment = "";
@@ -108,8 +103,9 @@ if (isset($_POST['id']))
 	
 	$conn = sqlConnection();
 	
+	
 	//Adjust Query to do insert
-	$sqlquery = "INSERT * FROM ARTICLE WHERE ID='" . $_POST['id'] . "'";
+	$sqlquery = "INSERT INTO " .$targetTable. "";
 
 	$result = $conn->query($sqlquery);		
 
@@ -171,7 +167,29 @@ function test_input($data) {
 			<div class = "col-xs-8 col-xs-offset-2">
 				<div>
 				<?php
-					
+					$conn = sqlConnection();
+					if(mysql_ping($conn))
+					{
+						$sqlquery = "SELECT * FROM ARTICLE WHERE ID='" .$_GET['id']. "'";
+						$result = $conn->query($sqlquery);		
+
+						//echo $result->fetch_fields();
+						if ($result->num_rows > 0) 
+						{
+							while($row = $result->fetch_row())
+							{
+								echo $row[2];
+								echo $row->title . "<br>";
+								echo $row->content . "<br>";
+								echo $row->date_time . "<br>";
+							}
+						} 
+						else 
+						{
+							echo "0 results";
+						}
+						$conn->close(); 
+					}
 				?>
 				</div>
 			</div>
@@ -196,7 +214,7 @@ function test_input($data) {
 			<label for="message" class="h4 ">Message</label>
 			<textarea id="message" class="form-control" rows="5" placeholder="Enter your message" required></textarea>
 		</div>
-		<button type="submit" id="form-submit" class="btn btn-success btn-lg pull-right ">Submit</button>
+		<button type="submit" id="form-submitComment" class="btn btn-success btn-lg pull-right " value = "ARTICLE_COMMENT">Submit</button>
 		<div id="msgSubmit" class="h3 text-center hidden">Message Submitted!</div>
 	</div>
 </div>
