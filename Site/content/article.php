@@ -105,11 +105,9 @@ if (isset($_POST['commentPost']))
 	
 	$conn = sqlConnection();
 	
-	$datetime = new DateTime();
-	
 	//Adjust Query to do insert
-	$sqlquery = "INSERT INTO " .$targetTable. 
-	"VALUES ( " .$_POST['id']. ", " .$username. ", " .$email. ", " .$content. ", " .$datetime. ")";
+	$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, USERNAME, EMAIL, CONTENT) VALUES ( " 
+	.$_POST['id']. ", " .$username. ", " .$email. ", " .$content. " )";
 
 	$result = $conn->query($sqlquery);		
 	
