@@ -3,12 +3,6 @@
 $nameErr = $emailErr = "";
 $name = $email = $comment = "";
 
-//DB Variables
-$serverName = "localhost";
-$username = "user";
-$password = "password";
-$dbName = "dpi902";
-
 //Determines if Comment is a Reply to a Comment or a Comment on the Article
 $targetTable = "";
 
@@ -37,7 +31,9 @@ if (isset($_GET['id']))
 	{
 		while($row = $result->fetch_row())
 		{
-			echo "id: " . $row->content . "<br>";
+			echo $row[1];
+			echo $row[2];
+			echo $row[3];
 		}
 	} 
 	else 
@@ -47,10 +43,10 @@ if (isset($_GET['id']))
 $conn->close(); 
 }
 
-if (isset($_POST['id'])) 
+if (isset($_POST['commentPost'])) 
 {
 	if(isset($_POST['form-submitComment']))
-		$targetTable = $_POST['form-submitComment'];
+		$targetTable = $_POST['commentPost'];
 	//else if (isset($_POST['form-submitReply']))
 		//$targetTable = $_POST['form-submitReply'];
 	
@@ -131,6 +127,12 @@ if (isset($_POST['id']))
 
 function sqlConnection()
 {
+	//DB Variables
+	$serverName = "localhost";
+	$username = "user";
+	$password = "password";
+	$dbName = "dpi902";
+	
 	// Create connection
 	$conn = new mysqli($serverName, $username, $password, $dbName);
 	// Check connection
@@ -171,29 +173,26 @@ function test_input($data) {
 			<div class = "col-xs-8 col-xs-offset-2">
 				<div>
 				<?php
+				/*
 					$conn = sqlConnection();
-					if(mysql_ping($conn))
-					{
-						$sqlquery = "SELECT * FROM ARTICLE WHERE ID='" .$_GET['id']. "'";
-						$result = $conn->query($sqlquery);		
+					
+					$sqlquery = "SELECT * FROM ARTICLE WHERE ID='" .$_GET['id']. "'";
+					$result = $conn->query($sqlquery);		
 
-						//echo $result->fetch_fields();
-						if ($result->num_rows > 0) 
+					//echo $result->fetch_fields();
+					if ($result->num_rows > 0) 
+					{
+						while($row = $result->fetch_row())
 						{
-							while($row = $result->fetch_row())
-							{
-								echo $row[2];
-								echo $row->title . "<br>";
-								echo $row->content . "<br>";
-								echo $row->date_time . "<br>";
-							}
-						} 
-						else 
-						{
-							echo "0 results";
+							echo $row[2];
 						}
-						$conn->close(); 
+					} 
+					else 
+					{
+						echo "0 results";
 					}
+					$conn->close(); 
+					*/
 				?>
 				</div>
 			</div>
@@ -218,7 +217,7 @@ function test_input($data) {
 			<label for="message" class="h4 ">Message</label>
 			<textarea id="message" class="form-control" rows="5" placeholder="Enter your message" required></textarea>
 		</div>
-		<button type="submit" id="form-submitComment" class="btn btn-success btn-lg pull-right " value = "ARTICLE_COMMENT">Submit</button>
+		<button name="commentPost" type="submit" id="form-submitComment" class="btn btn-success btn-lg pull-right " value = "ARTICLE_COMMENT">Submit</button>
 		<div id="msgSubmit" class="h3 text-center hidden">Message Submitted!</div>
 	</div>
 </div>
