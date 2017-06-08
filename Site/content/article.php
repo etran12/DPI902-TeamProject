@@ -61,11 +61,14 @@ if (isset($_POST['id']))
 	else
 	{
 		$name = test_input($_POST["name"]);
+		
+		/* Uncomment when developing PROPER security measures
 		// check if name only contains letters and whitespace
 		if (!preg_match("/^[a-zA-Z ]*$/",$name)) 
 		{
 			$nameErr = "Only letters and white space allowed"; 
 		}
+		*/
 	}
   
 	if (empty($_POST["email"])) 
@@ -75,11 +78,14 @@ if (isset($_POST['id']))
 	else 
 	{
 		$email = test_input($_POST["email"]);
+		
+		/* Uncomment when developing PROPER security measures`
 		// check if e-mail address is well-formed
 		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) 
 		{
 		$emailErr = "Invalid email format"; 
 		}
+		*/
 	}
 	if (empty($_POST["comment"])) 
 	{
@@ -103,24 +109,22 @@ if (isset($_POST['id']))
 	
 	$conn = sqlConnection();
 	
+	$datetime = new DateTime();
 	
 	//Adjust Query to do insert
-	$sqlquery = "INSERT INTO " .$targetTable. "";
+	$sqlquery = "INSERT INTO " .$targetTable. 
+	"VALUES ( " .$_POST['id']. ", " .$username. ", " .$email. ", " .$content. ", " .$datetime. ")";
 
 	$result = $conn->query($sqlquery);		
-
+	
 	//echo $result->fetch_fields();
-	if ($result->num_rows > 0) 
+	if ($result) 
 	{
-		while($row = $result->fetch_row())
-		{
-			echo $row[2];
-			echo "id: " . $row->content . "<br>";
-		}
+		echo "Successful Insert";
 	} 
 	else 
 	{
-		echo "0 results";
+		echo "Failed Insert";
 	}
 	$conn->close(); 
 }
