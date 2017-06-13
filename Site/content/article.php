@@ -142,6 +142,11 @@ if (isset($_GET['id'])){
 			$content = test_input($_POST["comment"]);
 		}
 		
+		//Suggested SQL Query from Elvis
+		$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, USERNAME, EMAIL, CONTENT, REPLY_ID) VALUES ()";
+		$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, USERNAME, EMAIL, CONTENT) VALUES ()";
+		
+		
 		$sqlquery = "INSERT INTO ARTICLE_COMMENT_REPLY (ARTICLE_ID, COMMENT_ID, USERNAME, EMAIL, CONTENT) VALUES ( " 
 		.$_GET['id']. ", ".$commentID.", '" .$name. "', '" .$email. "', '" .$content. "')";
 	
