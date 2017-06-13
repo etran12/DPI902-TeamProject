@@ -7,9 +7,6 @@ if(!isset($_GET['pageno'])){
 $nameErr = $emailErr = "";
 $name = $email = $content = "";
 
-//Determines if Comment is a Reply to a Comment or a Comment on the Article
-$targetTable = "";
-
 if (isset($_GET['id'])){
 
 	$conn = sqlConnection();
