@@ -6,7 +6,6 @@
 }
 
 #headerImageBox{
-	background-image: url('../../Media/header-bg.jpg');
     background-repeat: no-repeat;
     background-attachment: scroll;
     background-position: center center;
