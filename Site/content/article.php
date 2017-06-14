@@ -14,9 +14,9 @@ if (isset($_GET['id'])){
 	$sqlquery = "SELECT * FROM ARTICLE WHERE ID='" . $_GET['id'] . "'";
 
 	$result = $conn->query($sqlquery);		
-
+	
 	if ($result->num_rows > 0){
-		$row = $result->fetch_assoc();		
+		$row = $result->fetch_assoc();
 ?>
 <div class="panel panel-default">
 	<div class="panel-heading">
@@ -67,20 +67,17 @@ if (isset($_GET['id'])){
 		
 		<div class = "row" style = "margin: 0 auto;padding-left:5%;padding-right:5%;">
 		<?php
-			$offset = 0;
-			$page_result = 5; 
-			
-			if($_GET['pageno']){
-				$page_value = $_GET['pageno'];
-				if($page_value > 1){	
-				  $offset = ($page_value - 1) * $page_result;
-				}
-			}
-			$sqlquery = "SELECT * FROM ARTICLE_COMMENT WHERE ARTICLE_ID = ".$_GET['id'];
+			$sqlquery = "SELECT * FROM ARTICLE_COMMENT WHERE ARTICLE_ID = ".$_GET['id']." AND COMMENT_ID IS NULL";
 			$result = $conn->query($sqlquery) or die(mysql_error());
-			$pagecount = $result->num_rows; // Total number of rows
-	
-			display_comments ($_GET['id'], $conn, $offset, $page_result);
+			$rowCount = $result->num_rows; // Total number of rows
+			
+			$pagination = new Pagination(5, $rowCount);
+		
+			if($rowCount > 0){
+				display_comments ($_GET['id'], $conn, $pagination->getOffset(), $pagination->getResultLimit());
+			}else{
+				echo "<p>No comments posted</p>";
+			}
 		?>
 	
 		
@@ -90,30 +87,7 @@ if (isset($_GET['id'])){
 	<div class = "panel-footer text-center">
 		<ul class="pagination" style = "float:none;display:inline-block;*display:inline;">
 		<?php
-			if($pagecount > $page_result){
-				$num = $pagecount / $page_result;
-			
-				if($_GET['pageno'] > 1){
-					echo "<li><a href = '?page=article&id=".$_GET['id']."&pageno=".($_GET['pageno'] - 1)."'> Prev </a></li>";
-				}
-				
-				for($i = 1 ; $i <= $num + 1 ; $i++){
-		
-					echo "<li";
-					if($_GET['pageno'] == $i){
-						echo " class = 'active'";
-					}
-					echo ">";
-					
-					echo "<a href = '?page=article&id=".$_GET['id']."&pageno=".$i."'>".$i."</a></li>";
-				}
-				
-				if($_GET['pageno'] < $num){
-					echo "<li><a href = '?page=article&id=".$_GET['id']."&pageno=".($_GET['pageno'] + 1)."'> Next </a></li>";
-				}	
-			}else{
-				echo "<p>No comments on this post.</p>";
-			}
+			$pagination->display();
 		?>
 		</ul>
 	</div>
@@ -142,14 +116,9 @@ if (isset($_GET['id'])){
 			$content = test_input($_POST["comment"]);
 		}
 		
-		//Suggested SQL Query from Elvis
-		$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, USERNAME, EMAIL, CONTENT, REPLY_ID) VALUES ()";
-		$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, USERNAME, EMAIL, CONTENT) VALUES ()";
+		$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, COMMENT_ID, USERNAME, EMAIL, CONTENT) VALUES 
+		(".$_GET['id'].", ".$commentID.", '".$name."', '".$email."', '".$content."')";
 		
-		
-		$sqlquery = "INSERT INTO ARTICLE_COMMENT_REPLY (ARTICLE_ID, COMMENT_ID, USERNAME, EMAIL, CONTENT) VALUES ( " 
-		.$_GET['id']. ", ".$commentID.", '" .$name. "', '" .$email. "', '" .$content. "')";
-	
 		$result = $conn->query($sqlquery);		
 		echo '<meta http-equiv="refresh" content="0">';
 		exit();		
@@ -216,3 +185,5 @@ function test_input($data) {
   return $data;
 }
 ?>
+
+
