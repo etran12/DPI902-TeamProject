@@ -1,4 +1,68 @@
 <?php
+
+class Pagination {
+	private $offset = 0;
+	private $page_result = 0;
+	private $rowCount = 0;
+	
+	public function __construct($page_result, $rowCount){
+		 $this->page_result = $page_result;
+		 $this->rowCount = $rowCount;
+
+		 if($_GET['pageno']){
+			$page_value = $_GET['pageno'];
+			if($page_value > 1){	
+				$this->offset = ($page_value - 1) * $this->page_result;
+			}
+		}
+	}
+	
+	public function getOffset(){
+		return $this->offset;
+	}
+	
+	public function getResultLimit(){
+		return $this->page_result;
+	}
+	
+	public function display(){
+		if($this->rowCount > $this->page_result){
+			$num = $this->rowCount / $this->page_result;
+			
+			$current_url = explode("?", $_SERVER['REQUEST_URI']);
+			$current_arguments = explode("&", $current_url[1]);
+
+			$temp = "?";
+			for($i = 0; $i < count($current_arguments)-1; $i++){
+				if($i==0){
+					$temp .= $current_arguments[$i];
+				}else{
+					$temp .= "&".$current_arguments[$i];
+				}
+			}
+			
+			if($_GET['pageno'] > 1){
+				echo "<li><a href = '".$temp."&pageno=".($_GET['pageno'] - 1)."'> Prev </a></li>";
+			}
+				
+			for($i = 1 ; $i < $num + 1 ; $i++){
+				echo "<li";
+				if($_GET['pageno'] == $i){
+					echo " class = 'active'";
+				}
+				echo ">";
+					
+				echo "<a href = '".$temp."&pageno=".$i."'>".$i."</a></li>";
+			}
+				
+			if($_GET['pageno'] < $num){
+				echo "<li><a href = '".$temp."&pageno=".($_GET['pageno'] + 1)."'> Next </a></li>";
+			}	
+		}
+		
+	}
+}
+
 /**
  * Displays site name.
  */
@@ -70,37 +134,31 @@ function sqlConnection()
 	return $conn;
 }
 
-function display_comments($article_id, $conn, $offset, $page_result){
-	$sqlquery = "SELECT * FROM ARTICLE_COMMENT WHERE ARTICLE_ID = ".$article_id." ORDER BY ID DESC LIMIT ".$offset.", ".$page_result;
-	$comments = $conn->query($sqlquery) or die(mysql_error());	
-	$margin = 0;
-	$counter = 0;
-	
-	foreach($comments as $comment) {
-		include 'content/comment.php';
-		
-		display_comments_replies($article_id, $comment['ID'], $comment["USERNAME"], $conn);
-		$counter++;
-	}
-}
 
-function display_comments_replies ($article_id, $parent_id, $to, $conn, $level=1) {
-  $sqlquery = "SELECT * FROM ARTICLE_COMMENT_REPLY WHERE ARTICLE_ID = ".$article_id." AND COMMENT_ID = ".$parent_id;
-  
-  $comments = $conn->query($sqlquery) or die(mysql_error());	
-  $margin = 10 * $level;
-  
-  foreach($comments as $comment) {
-        $comment_id = $comment['ID'];  
-		
-		//$sqlquery = "SELECT USERNAME FROM ARTICLE_COMMENT_REPLY WHERE COMMENT_ID = ".$parent_id;
-		//$res = $conn->query($sqlquery) or die(mysql_error());
-		//$temp = $res->fetch_assoc();
-		//$to = $temp["USERNAME"];
-		
-		require 'content/comment.php';
-		$to = $comment['USERNAME'];
-        display_comments_replies ($article_id, $comment_id, $to, $conn, $level+1);
-    }
-}    
+function display_comments($article_id, $conn, $offset, $page_result, $parent_id=0, $name=NULL, $level=0){
+	  $temp = "";
+	  if($parent_id > 0){
+		  $temp = "COMMENT_ID = ".$parent_id;
+	  }else{
+		  $temp = "COMMENT_ID IS NULL";
+	  }
+	  
+	  $sqlquery = "SELECT * FROM ARTICLE_COMMENT WHERE ARTICLE_ID = ".$article_id." AND ".$temp." ORDER BY ID DESC LIMIT ".$offset.", ".$page_result;
+	  	
+	  $comments = $conn->query($sqlquery) or die(mysql_error());	
+	  $margin = 10 * $level;
+	  $to = $name;
+	  
+      $counter = 0;	
+	  if($parent_id!=0) $counter = NULL;
+		  
+	  foreach($comments as $comment) {
+		   $comment_id = $comment['ID'];  
+		   $username = $comment['USERNAME'];
+		   
+		   include 'content/comment.php';
+		   display_comments ($article_id, $conn, $offset, $page_result, $comment_id, $username, $level+1);
+		   if($parent_id==0) $counter++;
+	  }	
+}  
 ?>
