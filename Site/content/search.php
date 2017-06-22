@@ -7,7 +7,13 @@ if(!isset($_GET['pageno'])){
 if (isset($_GET['srch-term'])){
 	$conn = sqlConnection();
 	
-	$searchTerm = $_GET['srch-term'];
+	$temp = explode(" ",$_GET['srch-term']);
+	
+	$searchTerm = "";
+	for($i = 0; $i < count($temp); $i++){
+		$temp[$i] .= "*";
+        $searchTerm .= $temp[$i];
+	}
 	
 	$sqlquery = "SELECT * FROM ARTICLE WHERE MATCH (TITLE,CONTENT) AGAINST ('".$searchTerm."' IN BOOLEAN MODE)";
 	$result = $conn->query($sqlquery);	
