@@ -1,4 +1,7 @@
 <?php
+	
+	session_start();
+	ob_start();
 	$headerImage = "/Site/Media/header-bg.jpg";
 	$headerTitle = "Home";
 	
@@ -16,8 +19,22 @@
 			$headerImage = $row["ARTICLE_IMAGE"];
 		}
 	}
+	
+	if (isset($_SESSION['username']) &&  $_SESSION['username'] != ""){ 
+		$sqlquery = "SELECT * FROM USERS WHERE USERNAME = '".$_SESSION['username']."'";
+		$result = $conn->query($sqlquery);
+		$row = $result->fetch_assoc();
+		$userImage = $row["USER_IMAGE"];
+	}
 ?>
 <script>
+	$(document).ready(function() {
+    $('.nav li').hover(function() {
+        $(this).addClass('active');
+      },function() {
+        $(this).removeClass('active');
+      });
+	});
 	$(function() {
 	  // Setup drop down menu
 	  $('.dropdown-toggle').dropdown();
@@ -32,7 +49,7 @@
 	<nav class="navbar navbar-default" style = "margin:0">
 		<div class="container">
 			<div class="navbar-header">
-				 <a class="navbar-brand" style = "padding:0;" href=""><img src="" class = "img-responsive"></a>
+				 <a class="navbar-brand" style = "padding:5px;" href="?page=home"><img style = "height: 100%;width:auto;" src="/Site/Media/logo.png" ></a>
 			</div>
 			<div id="navbar">
 				<ul class="nav navbar-nav">
@@ -40,15 +57,51 @@
 				</ul>
 				
 				<ul class="nav pull-right">
-					<li class="dropdown" style = "margin-top:3px;">
-						<a class="btn btn-default" href="" data-toggle="dropdown">Sign In <strong class="caret"></strong></a>
+					<li class="dropdown" style = "margin-top:7px;">
+						<?php
+						if (isset($_SESSION['username']) &&  $_SESSION['username'] != ""){ 
+							
+						?>
+							<style>
+								.b-image:before{
+									background-image : url(
+									<?php
+										if(isset($userImage)){
+											echo $userImage;
+										}else{
+											echo "http://www.keita-gaming.com/assets/profile/default-avatar-c5d8ec086224cb6fc4e395f4ba3018c2.jpg";
+										}
+									?>
+									);
+									background-size: 20px 20px;
+									background-repeat: no-repeat;
+									border-radius: 25px;
+								}
+							</style>
+							
+							<button class="btn btn-default button-image b-image" data-toggle="dropdown" href=""><?php echo $_SESSION['username']; ?> <strong class="caret"></strong></button>
+							
+						<?php
+						}else{ 
+						?>
+							<button class="btn btn-default" href="" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Sign In <strong class="caret"></strong></button>
+						<?php
+						}
+						?>
 						<div class="dropdown-menu" style="padding: 5px; min-width:100%;">
 							<?php
+							if (isset($_SESSION['username']) &&  $_SESSION['username'] != ""){ 
+							?>
+								<a href="?page=logout"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a>
+							<?php
+							}else{ 
 								include("content/login.php");
+							}
 							?>
 						</div>
 					</li>
 				</ul>
+				
 				<form class="navbar-form pull-right" role="search" method="GET" action="">
 					<div class="input-group add-on">
 					  <input type="hidden" name="page" value="search">
@@ -68,7 +121,7 @@
 		if(isset($headerImage)){
 			echo "background-image: url('".$headerImage."');";
 		}else{
-			echo "background-image: url('/Site/Media/header-bg.jpg');";
+			echo "background-image: url('/Media/header-bg.jpg');";
 		}
 	?>
 	">
