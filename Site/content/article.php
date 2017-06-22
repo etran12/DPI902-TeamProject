@@ -41,6 +41,9 @@ if (isset($_GET['id'])){
 		<h2>Add Comment</h2>
 		<hr>
 		<form action="" method="post">
+			<?php
+			if (!isset($_SESSION['username'])){ 
+			?>
 			<div class="row">
 				<div class="form-group col-xs-6">
 					<label for="name" class="h4">Name</label>
@@ -51,11 +54,14 @@ if (isset($_GET['id'])){
 					<input type="email" class="form-control" id="email" name = "email" placeholder="Enter email" required>
 				</div>
 			</div>
+			<?php
+			}
+			?>
 			<div class="form-group">
 				<label for="message" class="h4 ">Message</label>
 				<textarea id="message" name = "comment" class="form-control" rows="5" placeholder="Enter your message" required></textarea>
 			</div>
-			<button name="commentPost" type="submit" id="form-submitComment" class="btn btn-success btn-lg pull-right " value = "ARTICLE_COMMENT">Submit</button>
+			<button name="commentPost" type="submit" id="form-submitComment" class="btn btn-success btn-lg pull-right" value = "">Submit</button>
 		</form>
 		<div id="msgSubmit" class="h3 text-center hidden">Message Submitted!</div>
 	</div>
@@ -84,6 +90,9 @@ if (isset($_GET['id'])){
 		</div>
 		
 	</div>
+	<?php
+		if($pagination->getRowCount() > $pagination->getResultLimit()){
+	?>
 	<div class = "panel-footer text-center">
 		<ul class="pagination" style = "float:none;display:inline-block;*display:inline;">
 		<?php
@@ -91,84 +100,72 @@ if (isset($_GET['id'])){
 		?>
 		</ul>
 	</div>
+	<?php
+		}
+	?>
 </div>
 <?php
-	$numItems = 5;
+		$numItems = 5;
+
+		if (isset($_POST['commentPost'])) {
+			$commentID = "";
+		
+			if(isset($_POST['commentPost'])) $commentID = $_POST['commentPost'];
 	
-	if (isset($_POST['commentReplyPost'])) {
-		if(isset($_POST['commentReplyPost'])) $commentID = $_POST['commentReplyPost'];
-		
-		if (empty($_POST["name"])) {
-			$nameErr = "Name is required";
-		}else{
-			$name = test_input($_POST["name"]);
-		}
-		
-		if (empty($_POST["email"])) {
-			$emailErr = "Email is required";
-		}else {
-			$email = test_input($_POST["email"]);
-		}
-		
-		if (empty($_POST["comment"])) {
-			$content = "";
-		} else {
-			$content = test_input($_POST["comment"]);
-		}
-		
-		$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, COMMENT_ID, USERNAME, EMAIL, CONTENT) VALUES 
-		(".$_GET['id'].", ".$commentID.", '".$name."', '".$email."', '".$content."')";
-		
-		$result = $conn->query($sqlquery);		
-		echo '<meta http-equiv="refresh" content="0">';
-		exit();		
-	}
-	
-	if (isset($_POST['commentPost'])) {
-		
-		if(isset($_POST['form-submitComment'])) $targetTable = $_POST['commentPost'];
-		
-		if (empty($_POST["name"])) {
-			$nameErr = "Name is required";
-		}else{
-			$name = test_input($_POST["name"]);
-			/* Uncomment when developing PROPER security measures
-			// check if name only contains letters and whitespace
-			if (!preg_match("/^[a-zA-Z ]*$/",$name)) 
-			{
-				$nameErr = "Only letters and white space allowed"; 
+			if (!isset($_SESSION['username'])){ 
+				if (empty($_POST["name"])) {
+					$nameErr = "Name is required";
+				}else{
+					$name = test_input($_POST["name"]);
+					/* Uncomment when developing PROPER security measures
+					// check if name only contains letters and whitespace
+					if (!preg_match("/^[a-zA-Z ]*$/",$name)) 
+					{
+						$nameErr = "Only letters and white space allowed"; 
+					}
+					*/
+				}
+				
+				if (empty($_POST["email"])) {
+					$emailErr = "Email is required";
+				}else {
+					$email = test_input($_POST["email"]);
+					/* Uncomment when developing PROPER security measures`
+					// check if e-mail address is well-formed
+					if (!filter_var($email, FILTER_VALIDATE_EMAIL)) 
+					{
+					$emailErr = "Invalid email format"; 
+					}
+					*/
+				}
+			}else{
+				$sqlquery = "SELECT * FROM USERS WHERE USERNAME = '".$_SESSION['username']."'";
+				$result = $conn->query($sqlquery);		
+				$user = $result->fetch_assoc();
+				
+				$name = $user["USERNAME"];
+				$email = $user["EMAIL"];
+				
 			}
-			*/
-		}
-		
-		if (empty($_POST["email"])) {
-			$emailErr = "Email is required";
-		}else {
-			$email = test_input($_POST["email"]);
-			/* Uncomment when developing PROPER security measures`
-			// check if e-mail address is well-formed
-			if (!filter_var($email, FILTER_VALIDATE_EMAIL)) 
-			{
-			$emailErr = "Invalid email format"; 
+			
+			if (empty($_POST["comment"])) {
+				$content = "";
+			} else {
+				$content = test_input($_POST["comment"]);
 			}
-			*/
+			
+			if($commentID==""){
+				$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, USERNAME, EMAIL, CONTENT) VALUES 
+				(".$_GET['id'].", '".$name."', '".$email."', '".$content."')";
+			}else{
+				$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, COMMENT_ID, USERNAME, EMAIL, CONTENT) VALUES 
+				(".$_GET['id'].", ".$commentID.", '".$name."', '".$email."', '".$content."')";
+			}
+			
+			$result = $conn->query($sqlquery);		
+			echo '<meta http-equiv="refresh" content="0">';
+			exit();
 		}
-		
-		if (empty($_POST["comment"])) {
-			$content = "";
-		} else {
-			$content = test_input($_POST["comment"]);
-		}
-		
-		$sqlquery = "INSERT INTO ARTICLE_COMMENT (ARTICLE_ID, USERNAME, EMAIL, CONTENT) VALUES ( " 
-		.$_GET['id']. ", '" .$name. "', '" .$email. "', '" .$content. "')";
-	
-		$result = $conn->query($sqlquery);		
-		//header('Location: ?page=article&id=1');
-		echo '<meta http-equiv="refresh" content="0">';
-		exit();
-	}	
-	
 	}else{
 		header('Location: ?page=404.php');
 		exit();

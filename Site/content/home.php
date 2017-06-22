@@ -1,14 +1,15 @@
-
 <?php
 	if(isset($_GET['page'])){
 		if(!isset($_GET['pageno'])){
 			$redirect = "http://".$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"]."&pageno=1";
 			header("Location: ".$redirect);
+			exit();
 		}
 	}else{
 		if(!isset($_GET['pageno'])){
 			$redirect = "http://".$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"]."?pageno=1";
 			header("Location: ".$redirect);
+			exit();
 		}
 	}
 	$conn = sqlConnection();
@@ -46,7 +47,7 @@
 											if(isset($row["ARTICLE_IMAGE"])){
 												echo $row["ARTICLE_IMAGE"];
 											}else{
-												echo "/Site/Media/header-bg.jpg";
+												echo "/Media/header-bg.jpg";
 											}
 										?>   
 										" class="img-responsive" alt="">
@@ -78,6 +79,9 @@
 			} 
 		?>
 	</div>
+	<?php
+		if($pagination->getRowCount() > $pagination->getResultLimit()){
+	?>
 	<div class = "panel-footer text-center">
 		<ul class="pagination" style = "float:none;display:inline-block;*display:inline;">
 		<?php
@@ -85,5 +89,8 @@
 		?>
 		</ul>
 	</div>
+	<?php
+		}
+	?>
 </div>
 

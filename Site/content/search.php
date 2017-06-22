@@ -12,7 +12,7 @@ if (isset($_GET['srch-term'])){
 	$sqlquery = "SELECT * FROM ARTICLE WHERE MATCH (TITLE,CONTENT) AGAINST ('".$searchTerm."' IN BOOLEAN MODE)";
 	$result = $conn->query($sqlquery);	
 	$rowCount = $result->num_rows; // Total number of rows
-	$pagination = new Pagination(5, $rowCount);
+	$pagination = new Pagination(4, $rowCount);
 	
 	$sqlquery = "SELECT * FROM ARTICLE WHERE MATCH (TITLE,CONTENT) AGAINST ('".$searchTerm."' IN BOOLEAN MODE) ORDER BY ID DESC LIMIT ".$pagination->getOffset().", ".$pagination->getResultLimit();
 	$result = $conn->query($sqlquery);	
@@ -41,7 +41,7 @@ if (isset($_GET['srch-term'])){
 									if(isset($row["ARTICLE_IMAGE"])){
 										echo $row["ARTICLE_IMAGE"];
 									}else{
-										echo "/Site/Media/header-bg.jpg";
+										echo "/Media/header-bg.jpg";
 									}	
 								?> 
 								" class="img-responsive" alt="">
@@ -73,6 +73,9 @@ if (isset($_GET['srch-term'])){
 	}
 ?>
 	</div>
+	<?php
+		if($pagination->getRowCount() > $pagination->getResultLimit()){
+	?>
 	<div class = "panel-footer text-center">
 		<ul class="pagination" style = "float:none;display:inline-block;*display:inline;">
 		<?php
@@ -80,6 +83,9 @@ if (isset($_GET['srch-term'])){
 		?>
 		</ul>
 	</div>
+	<?php
+		}
+	?>
 </div>	
 <?php
 }
