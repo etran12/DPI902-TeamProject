@@ -25,6 +25,10 @@ class Pagination {
 		return $this->page_result;
 	}
 	
+	public function getRowCount(){
+		return $this->rowCount;
+	}
+	
 	public function display(){
 		if($this->rowCount > $this->page_result){
 			$num = $this->rowCount / $this->page_result;
@@ -142,20 +146,23 @@ function display_comments($article_id, $conn, $offset, $page_result, $parent_id=
 	  }else{
 		  $temp = "COMMENT_ID IS NULL";
 	  }
+
+	  $sqlquery = "SELECT * FROM ARTICLE_COMMENT WHERE ARTICLE_ID = ".$article_id." AND ".$temp;
 	  
-	  $sqlquery = "SELECT * FROM ARTICLE_COMMENT WHERE ARTICLE_ID = ".$article_id." AND ".$temp." ORDER BY ID DESC LIMIT ".$offset.", ".$page_result;
-	  	
+	  if($parent_id == 0){
+		  $sqlquery .= " ORDER BY ID DESC LIMIT ".$offset.", ".$page_result;
+	  }
 	  $comments = $conn->query($sqlquery) or die(mysql_error());	
 	  $margin = 10 * $level;
 	  $to = $name;
 	  
       $counter = 0;	
 	  if($parent_id!=0) $counter = NULL;
-		  
+	  
 	  foreach($comments as $comment) {
 		   $comment_id = $comment['ID'];  
 		   $username = $comment['USERNAME'];
-		   
+		 
 		   include 'content/comment.php';
 		   display_comments ($article_id, $conn, $offset, $page_result, $comment_id, $username, $level+1);
 		   if($parent_id==0) $counter++;
