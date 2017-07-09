@@ -1,30 +1,41 @@
 <?php
-	
 	session_start();
 	ob_start();
+
 	$headerImage = "/Site/Media/header-bg.jpg";
 	$headerTitle = "Home";
-	
+
 	$conn = sqlConnection();
+	
+	if (isset($_SESSION['user_id']) &&  $_SESSION['user_id'] != ""){ 
+		$sqlquery = "SELECT * FROM USERS WHERE ID = '".$_SESSION['user_id']."'";
+		$result = $conn->query($sqlquery);
+		$user_row = $result->fetch_assoc();
+		$userImage = $user_row["USER_IMAGE"];
+	}
 
 	if(isset($_GET['page'])){
 		$page = $_GET['page'];
 		if($page == "article"){
 			$id = $_GET['id'];
-			$sqlquery = "SELECT TITLE, ARTICLE_IMAGE FROM ARTICLE WHERE ID = ".$id;
-			$result = $conn->query($sqlquery);
-			$row = $result->fetch_assoc();
 			
-			$headerTitle = $row["TITLE"];
-			$headerImage = $row["ARTICLE_IMAGE"];
+			$sqlquery = "SELECT TITLE, CONTENT, ARTICLE_IMAGE, DATE_TIME FROM ARTICLE WHERE ID = ".$id;
+			
+			
+			$result = $conn->query($sqlquery);
+			global $num_rows;	
+			if(!empty($result)){
+				$num_rows = $result->num_rows;
+				
+				global $row;
+				$row = $result->fetch_assoc();
+				
+				$headerTitle = $row["TITLE"];
+				$headerImage = $row["ARTICLE_IMAGE"];
+			}else{
+				$num_rows = 0;
+			}
 		}
-	}
-	
-	if (isset($_SESSION['username']) &&  $_SESSION['username'] != ""){ 
-		$sqlquery = "SELECT * FROM USERS WHERE USERNAME = '".$_SESSION['username']."'";
-		$result = $conn->query($sqlquery);
-		$row = $result->fetch_assoc();
-		$userImage = $row["USER_IMAGE"];
 	}
 ?>
 <script>
@@ -49,7 +60,7 @@
 	<nav class="navbar navbar-default" style = "margin:0">
 		<div class="container">
 			<div class="navbar-header">
-				 <a class="navbar-brand" style = "padding:5px;" href="?page=home"><img style = "height: 100%;width:auto;" src="/Site/Media/logo.png" ></a>
+				 <a class="navbar-brand" style = "padding:5px;" href="?page=home"><img style = "height: 100%;width:auto;" src="Media/logo.png" ></a>
 			</div>
 			<div id="navbar">
 				<ul class="nav navbar-nav">
@@ -59,7 +70,7 @@
 				<ul class="nav pull-right">
 					<li class="dropdown" style = "margin-top:7px;">
 						<?php
-						if (isset($_SESSION['username']) &&  $_SESSION['username'] != ""){ 
+						if (isset($_SESSION['user_id']) &&  $_SESSION['user_id'] != ""){ 
 							
 						?>
 							<style>
@@ -79,7 +90,7 @@
 								}
 							</style>
 							
-							<button class="btn btn-default button-image b-image" data-toggle="dropdown" href=""><?php echo $_SESSION['username']; ?> <strong class="caret"></strong></button>
+							<button class="btn btn-default button-image b-image" data-toggle="dropdown" href=""><?php echo $user_row['USERNAME']; ?> <strong class="caret"></strong></button>
 							
 						<?php
 						}else{ 
@@ -88,17 +99,21 @@
 						<?php
 						}
 						?>
-						<div class="dropdown-menu" style="padding: 5px; min-width:100%;">
+						<ul class="dropdown-menu" style="padding: 5px; min-width:100%;">
 							<?php
-							if (isset($_SESSION['username']) &&  $_SESSION['username'] != ""){ 
+							if (isset($_SESSION['user_id']) &&  $_SESSION['user_id'] != ""){ 
 							?>
-								<a href="?page=logout"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a>
+								<li><a href="?page=editUserInfo"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Change User Information</a></li>
+								<li><a href="?page=changePassword"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Change Password</a></li>
+								<li><a href="?page=articleForm&action=add"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Add Article</a></li>
+								<li><a href="?page=articleList"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit Articles</a></li>
+								<li><a href="?page=/operations/logout"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a></li>
 							<?php
 							}else{ 
 								include("content/login.php");
 							}
 							?>
-						</div>
+						</ul>
 					</li>
 				</ul>
 				
@@ -121,7 +136,7 @@
 		if(isset($headerImage)){
 			echo "background-image: url('".$headerImage."');";
 		}else{
-			echo "background-image: url('/Media/header-bg.jpg');";
+			echo "background-image: url('Media/header-bg.jpg');";
 		}
 	?>
 	">
