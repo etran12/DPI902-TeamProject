@@ -47,7 +47,7 @@
 											if(isset($row["ARTICLE_IMAGE"])){
 												echo $row["ARTICLE_IMAGE"];
 											}else{
-												echo "/Media/header-bg.jpg";
+												echo "Media/header-bg.jpg";
 											}
 										?>   
 										" class="img-responsive" alt="">
@@ -76,7 +76,9 @@
 					if($counter % 2 == $rowWidth) echo '</div>';
 					$counter++;
 				}
-			} 
+			}else{
+				echo "No Articles to Display";
+			}
 		?>
 	</div>
 	<?php
@@ -91,6 +93,7 @@
 	</div>
 	<?php
 		}
+		$conn->close();
 	?>
 </div>
 

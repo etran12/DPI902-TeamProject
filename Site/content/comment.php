@@ -80,7 +80,7 @@
 				<hr>
 				<form action="" method="post">
 					<?php
-					if (!isset($_SESSION['username'])){ 
+					if (!isset($_SESSION['user_id'])){ 
 					?>
 					<div class="row">
 						<div class="form-group col-xs-6">

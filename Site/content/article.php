@@ -4,24 +4,23 @@ if(!isset($_GET['pageno'])){
 	header("Location: ".$redirect);
 }
 
+global $row;
+global $num_rows;
 $nameErr = $emailErr = "";
 $name = $email = $content = "";
 
-if (isset($_GET['id'])){
 
+if (isset($_GET['id'])){
 	$conn = sqlConnection();
 	
-	$sqlquery = "SELECT * FROM ARTICLE WHERE ID='" . $_GET['id'] . "'";
-
-	$result = $conn->query($sqlquery);		
+	if ($num_rows > 0){
 	
-	if ($result->num_rows > 0){
-		$row = $result->fetch_assoc();
 ?>
 <div class="panel panel-default">
 	<div class="panel-heading">
 		<a href="?page=home">Back to list</a>
-		<h1 style = "margin-top:1%;"><?php echo $row["TITLE"]; ?></h1>
+		<h1 style = "margin-top:1%;display"><?php echo $row["TITLE"]; ?></h1>
+		<time class="comment-date" datetime="5-25-2017 01:05"><i class="fa fa-clock-o"></i> <?php echo $row["DATE_TIME"]; ?></time>
 	</div>
 	
 	<div class="panel-body">
@@ -42,7 +41,7 @@ if (isset($_GET['id'])){
 		<hr>
 		<form action="" method="post">
 			<?php
-			if (!isset($_SESSION['username'])){ 
+			if (!isset($_SESSION['user_id'])){ 
 			?>
 			<div class="row">
 				<div class="form-group col-xs-6">
@@ -112,7 +111,7 @@ if (isset($_GET['id'])){
 		
 			if(isset($_POST['commentPost'])) $commentID = $_POST['commentPost'];
 	
-			if (!isset($_SESSION['username'])){ 
+			if (!isset($_SESSION['user_id'])){ 
 				if (empty($_POST["name"])) {
 					$nameErr = "Name is required";
 				}else{
@@ -139,7 +138,7 @@ if (isset($_GET['id'])){
 					*/
 				}
 			}else{
-				$sqlquery = "SELECT * FROM USERS WHERE USERNAME = '".$_SESSION['username']."'";
+				$sqlquery = "SELECT * FROM USERS WHERE ID = '".$_SESSION['user_id']."'";
 				$result = $conn->query($sqlquery);		
 				$user = $result->fetch_assoc();
 				
@@ -167,11 +166,12 @@ if (isset($_GET['id'])){
 			exit();
 		}
 	}else{
+		$conn->close();
 		header('Location: ?page=404.php');
 		exit();
 	}
 	
-	//$conn->close(); 
+	$conn->close(); 
 	exit();
 }
 

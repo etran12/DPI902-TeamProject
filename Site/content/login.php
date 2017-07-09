@@ -15,7 +15,7 @@ if(isset($_POST['submit'])){
 		if($result->num_rows > 0){
 			$user = $result->fetch_assoc();
 			$_SESSION["user_id"] = $user["ID"];
-			$_SESSION["username"] = $user["USERNAME"];
+			//$_SESSION["username"] = $user["USERNAME"];
 	
 		
 			if(!empty($_POST["remember"])) {

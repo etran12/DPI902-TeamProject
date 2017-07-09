@@ -15,21 +15,26 @@ if (isset($_GET['srch-term'])){
         $searchTerm .= $temp[$i];
 	}
 	
+	$pagination = null;
+	
 	$sqlquery = "SELECT * FROM ARTICLE WHERE MATCH (TITLE,CONTENT) AGAINST ('".$searchTerm."' IN BOOLEAN MODE)";
 	$result = $conn->query($sqlquery);	
-	$rowCount = $result->num_rows; // Total number of rows
-	$pagination = new Pagination(4, $rowCount);
 	
-	$sqlquery = "SELECT * FROM ARTICLE WHERE MATCH (TITLE,CONTENT) AGAINST ('".$searchTerm."' IN BOOLEAN MODE) ORDER BY ID DESC LIMIT ".$pagination->getOffset().", ".$pagination->getResultLimit();
-	$result = $conn->query($sqlquery);	
+
 ?>
 <div class="panel panel-default">
 	<div class="panel-body">
 <?php
-	if ($result->num_rows > 0){
+	
+	if(isset($result->num_rows)){
+		$rowCount = $result->num_rows; // Total number of rows
+		$pagination = new Pagination(4, $rowCount);
+		$sqlquery = "SELECT * FROM ARTICLE WHERE MATCH (TITLE,CONTENT) AGAINST ('".$searchTerm."' IN BOOLEAN MODE) ORDER BY ID DESC LIMIT ".$pagination->getOffset().", ".$pagination->getResultLimit();
+		$result = $conn->query($sqlquery);	
+		if ($result->num_rows > 0){
 		
 
-		while($row = $result->fetch_assoc()){
+			while($row = $result->fetch_assoc()){
 ?>
 			<div class = "row">
 				<div class = "col-xs-12">
@@ -47,7 +52,7 @@ if (isset($_GET['srch-term'])){
 									if(isset($row["ARTICLE_IMAGE"])){
 										echo $row["ARTICLE_IMAGE"];
 									}else{
-										echo "/Media/header-bg.jpg";
+										echo "Media/header-bg.jpg";
 									}	
 								?> 
 								" class="img-responsive" alt="">
@@ -73,6 +78,9 @@ if (isset($_GET['srch-term'])){
 				</div>
 			</div>
 <?php
+			}
+		}else{
+			echo "No Results";
 		}
 	}else{
 		echo "No Results";
@@ -80,16 +88,18 @@ if (isset($_GET['srch-term'])){
 ?>
 	</div>
 	<?php
-		if($pagination->getRowCount() > $pagination->getResultLimit()){
+		if(isset($pagination)){
+			if($pagination->getRowCount() > $pagination->getResultLimit()){
 	?>
 	<div class = "panel-footer text-center">
 		<ul class="pagination" style = "float:none;display:inline-block;*display:inline;">
 		<?php
-			$pagination->display();
+				$pagination->display();
 		?>
 		</ul>
 	</div>
 	<?php
+			}
 		}
 	?>
 </div>	
