@@ -30,7 +30,7 @@
 							<a href = "?page=articleForm&id=<?php echo $row["ID"]; ?>">Edit</a>
 							
 							<form id = "hidden_form<?php echo $row['ID']; ?>" action="?page=/operations/deleteArticle" method="POST" style="display: none">
-							  <input type="hidden" name="id" value="<?php echo $row['ID']; ?>">
+								<input class = "listInput" type="hidden" name="id" value="<?php echo $row['ID']; ?>">
 							</form>
 							<a href = "" onclick="$('#hidden_form<?php echo $row['ID']; ?>').submit(); return false;">Delete</a>
 						</div>
